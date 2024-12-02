@@ -53,4 +53,16 @@ public class BoardService {
             return null;
         }
     }
+
+    public BoardDTO update(BoardDTO boardDTO) {
+        // id가 존재하면 update, 존재하지 않으면 insert로 간주함 (여기선 update)
+        BoardEntity boardEntity = BoardEntity.toUpdateEntity(boardDTO);
+        boardRepository.save(boardEntity); // Repository에 데이터 저장 여기서 hits 초기화
+        return findById(boardDTO.getId());
+    }
+
+    public void delete(Long id) {
+        // 게시글 삭제
+        boardRepository.deleteById(id);
+    }
 }
