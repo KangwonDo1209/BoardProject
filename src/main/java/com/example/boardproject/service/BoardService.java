@@ -5,9 +5,11 @@ import com.example.boardproject.entity.BoardEntity;
 import com.example.boardproject.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 // DTO -> Entity
 // Entity -> DTO
@@ -26,12 +28,29 @@ public class BoardService {
     }
 
     public List<BoardDTO> findAll() {
-        // Repository에서 게시글 Entity리스트를 받아
+        // Repository에서 게시글 Entity리스트를 받아 각각을 DTO리스트로 변환시켜 반환
         List<BoardEntity> boardEntityList = boardRepository.findAll();
         List<BoardDTO> boardDTOList = new ArrayList<>();
         for(BoardEntity boardEntity: boardEntityList) {
             boardDTOList.add(BoardDTO.toBoardDTO(boardEntity));
         }
         return boardDTOList;
+    }
+    @Transactional // 자동적 트랜잭션 관리를 통해 update, delete 등의 작업이 안전하게 수행되게 함
+    public void updateHits(Long id) {
+        boardRepository.updateHits(id); // id에 해당하는 게시글 조회수 증가
+    }
+
+    public BoardDTO findById(Long id) { // id에 해당하는 게시글 탐색 및 반환
+        // Optinal을 통해 데이터 존재 여부를 안전하게 처리 가능
+        Optional<BoardEntity> optionalBoardEntity = boardRepository.findById(id);
+        if(optionalBoardEntity.isPresent()){ // 존재하면 DTO로 변환 후 반환
+            BoardEntity boardEntity = optionalBoardEntity.get();
+            BoardDTO boardDTO = BoardDTO.toBoardDTO(boardEntity);
+            return boardDTO;
+        }
+        else{ // 존재하지 않으면 null 반환
+            return null;
+        }
     }
 }
