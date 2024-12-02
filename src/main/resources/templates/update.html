@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>update</title>
+</head>
+<body>
+<form action="/board/update" method="post" name="updateForm">
+    <input type="hidden" name="id" th:value="${boardUpdate.id}">
+    <!-- readonly 속성을 적용하여 수정 불가능하게 설정 -->
+    writer: <input type="text" name="boardWriter" th:value="${boardUpdate.boardWriter}" readonly> <br>
+    <!-- pass는 비밀번호를 입력 받은 후 검증의 과정을 거치기 위하여 thymeleaf를 적용하지 않음 -->
+    pass: <input type="text" name="boardPass" id="boardPass"> <br>
+    title: <input type="text" name="boardTitle" th:value="${boardUpdate.boardTitle}"> <br>
+    contents: <textarea name="boardContents" cols="30" rows="10" th:text="${boardUpdate.boardContents}"></textarea> <br>
+    <!-- type을 hidden으로 받아 사용자에게 보여주지 않음 -->
+    <input type="hidden" name="boardHits" th:value="${boardUpdate.boardHits}">
+    <input type="button" value="글수정" onclick="boardUpdate()">
+</form>
+<script th:inline="javascript">
+    const boardUpdate = () => { <!-- 비밀번호 검증 후 게시글 수정 -->
+        const pass = [[${boardUpdate.boardPass}]];
+        const inputPass = document.getElementById("boardPass").value;
+        if (pass == inputPass) {
+            document.updateForm.submit();
+        } else {
+            alert("비밀번호가 일치하지 않습니다!");
+        }
+    }
+</script>
+</body>

@@ -41,5 +41,17 @@ public class BoardEntity extends BaseEntity {
         boardEntity.setBoardHits(0);
         return boardEntity;
     }
+    // DTO를 받아서 Entity로 반환하는 함수
+    // Controller단에서 데이터를 수정하여 Repository에 업데이트 하기 위하여 Service단에 요청
+    public static BoardEntity toUpdateEntity(BoardDTO boardDTO) {
+        BoardEntity boardEntity = new BoardEntity();
+        boardEntity.setId(boardDTO.getId()); // toSaveEntity와 다르게 Id를 가져옴
+        boardEntity.setBoardWriter(boardDTO.getBoardWriter());
+        boardEntity.setBoardPass(boardDTO.getBoardPass());
+        boardEntity.setBoardTitle(boardDTO.getBoardTitle());
+        boardEntity.setBoardContents(boardDTO.getBoardContents());
+        boardEntity.setBoardHits(boardDTO.getBoardHits()); // toSaveEntity와 다르게 Hits를 가져옴 (강의에선 boardEntity에서 가져와서 오류 발생)
+        return boardEntity;
+    }
 }
 
