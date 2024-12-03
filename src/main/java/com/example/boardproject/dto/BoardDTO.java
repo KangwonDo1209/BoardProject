@@ -21,6 +21,14 @@ public class BoardDTO {
     private LocalDateTime boardCreatedTime;
     private LocalDateTime boardUpdatedTime;
 
+    public BoardDTO(Long id, String boardWriter, String boardTitle, int boardHits, LocalDateTime boardCreatedTime) {
+        this.id = id;
+        this.boardWriter = boardWriter;
+        this.boardTitle = boardTitle;
+        this.boardHits = boardHits;
+        this.boardCreatedTime = boardCreatedTime;
+    }
+
     // Entity를 받아서 DTO로 반환하는 함수
     // Controller단에서 데이터를 View단에 보여주기 위하여 Service단에 요청
     public static BoardDTO toBoardDTO(BoardEntity boardEntity){
