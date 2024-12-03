@@ -61,8 +61,8 @@ public class BoardController {
     public String update(@ModelAttribute BoardDTO boardDTO, Model model){ // ModelAttribute를 통해 데이터를 DTO로 변환해서 처리
         BoardDTO board = boardService.update(boardDTO); // 게시글 수정 후, 게시글 정보를 가져옴
         model.addAttribute("board", board); // 가져온 게시글 정보를 model에 저장
-        return "detail"; // 해당 게시글을 다시 반환하지만, update 페이지에서 detail을 보여주는 문제 발생 (새로고침 시 불편함)
-        //return "redirect:/board/" + boardDTO.getId(); // 이 방법을 사용하면, 수정마다 조회수가 1 늘어나는 문제점 발생
+        // return "detail"; // 해당 게시글을 다시 반환하지만, update 페이지에서 detail을 보여주는 문제 발생 (새로고침 시 불편함)
+        return "redirect:/board/" + boardDTO.getId(); // 이 방법을 사용하면, 수정마다 조회수가 1 늘어나는 문제점 발생
     }
 
     @GetMapping("/delete/{id}")
