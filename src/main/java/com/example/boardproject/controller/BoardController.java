@@ -1,7 +1,9 @@
 package com.example.boardproject.controller;
 
 import com.example.boardproject.dto.BoardDTO;
+import com.example.boardproject.dto.CommentDTO;
 import com.example.boardproject.service.BoardService;
+import com.example.boardproject.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +20,7 @@ import java.util.List;
 @RequestMapping("/board") // 이 클래스의 모든 Mapping은 /board 하위 매핑으로 처리 됨
 public class BoardController {
     private final BoardService boardService;
+    private final CommentService commentService;
 
     @GetMapping("/save")
     public String saveForm(){
@@ -46,6 +49,10 @@ public class BoardController {
         // 이 과정에서 게시글의 조회수를 증가시킨다.
         boardService.updateHits(id); // 조회수 +1
         BoardDTO boardDTO = boardService.findById(id); // 게시글 불러오기
+        /* 댓글 목록 가져오기 */
+        List<CommentDTO> commentDTOList = commentService.findAll(id);
+        model.addAttribute("commentList", commentDTOList);
+
         model.addAttribute("board", boardDTO); // model에 게시글 데이터 저장
         model.addAttribute("page", pageable.getPageNumber()); // page 데이터를 저장하여 목록으로 돌아올 때 사용
         return "detail";
