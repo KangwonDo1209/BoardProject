@@ -119,7 +119,6 @@ public class BoardService {
         // pageable을 입력받아, 해당되는 Page<BoardDTO> 객체를 반환
         int page = pageable.getPageNumber() - 1; // page 위치에 있는 값은 0부터 시작(요청은 1부터 시작)
         // int pageLimit = 3; // 한 페이지에 보여줄 글 갯수
-        System.out.println("pageLimit: " + pageLimit);
         Page<BoardEntity> boardEntities = // BoardEntity의 id를 기준으로 내림차순하여 한 페이지에 3개의 글을 보여줌.
                 boardRepository.findAll(PageRequest.of(page,pageLimit, Sort.by(Sort.Direction.DESC,"id")));
 //        System.out.println("boardEntities.getContent() = " + boardEntities.getContent()); // 요청 페이지에 해당하는 글

@@ -44,7 +44,8 @@ public class BoardController {
 
     @GetMapping("/{id}")
     public String findById(@PathVariable Long id, Model model,
-                           @PageableDefault(page=1) Pageable pageable){
+                           @PageableDefault(page=1) Pageable pageable,
+                           @RequestParam(defaultValue = "3") int pageLimit){
         // DB에서 id에 해당하는 게시글의 데이터를 찾아서 detail.html에 보여준다.
         // 이 과정에서 게시글의 조회수를 증가시킨다.
         boardService.updateHits(id); // 조회수 +1
@@ -52,9 +53,9 @@ public class BoardController {
         /* 댓글 목록 가져오기 */
         List<CommentDTO> commentDTOList = commentService.findAll(id);
         model.addAttribute("commentList", commentDTOList);
-
         model.addAttribute("board", boardDTO); // model에 게시글 데이터 저장
         model.addAttribute("page", pageable.getPageNumber()); // page 데이터를 저장하여 목록으로 돌아올 때 사용
+        model.addAttribute("pageLimit", pageLimit); // pageLimit을 저장하여, 목록으로 돌아올 때 사용
         return "detail";
     }
 
@@ -81,9 +82,10 @@ public class BoardController {
 
     // /board/paging?page=1
     @GetMapping("/paging")
-    public String paging(@PageableDefault(page = 1) Pageable pageable, Model model){ // page를 입력으로 받으며, 입력이 없을 시 1페이지로 제공
+    public String paging(@PageableDefault(page = 1) Pageable pageable, @RequestParam(defaultValue = "3") int pageLimit, Model model){ // page를 입력으로 받으며, 입력이 없을 시 1페이지로 제공
         // 입력받은 페이지에 해당하는 게시글 기본 정보를 boardList에 저장
-        Page<BoardDTO> boardList = boardService.paging(pageable,3); // BoardDTO가 담긴 Page객체를 서비스에 호출(pageable을 파라미터로)
+        System.out.println("pageLimit = " + pageLimit);
+        Page<BoardDTO> boardList = boardService.paging(pageable,pageLimit); // BoardDTO가 담긴 Page객체를 서비스에 호출(pageable을 파라미터로)
         // 페이지 목록 정보(1,2,3... 페이지)
         int blockLimit = 5; // 1 2 3 4 5
         int startPage = (((int)(Math.ceil((double)pageable.getPageNumber() / blockLimit))) - 1) * blockLimit + 1;
@@ -93,6 +95,7 @@ public class BoardController {
         model.addAttribute("boardList", boardList);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
+        model.addAttribute("pageLimit", pageLimit);
         return "paging";
     }
 }

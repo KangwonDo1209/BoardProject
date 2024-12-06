@@ -115,7 +115,8 @@
   const listReq = () => {
     console.log("목록 요청");
     const page = [[${page}]];
-    location.href = "/board/paging?page="+page;
+    const pageLimit = [[${pageLimit}]];
+    location.href = "/board/paging?page="+page+"&pageLimit="+pageLimit;
   }
   const updateReq = () => {
     console.log("수정 요청");
