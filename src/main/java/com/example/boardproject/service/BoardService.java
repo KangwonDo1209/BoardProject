@@ -6,6 +6,7 @@ import com.example.boardproject.entity.BoardFileEntity;
 import com.example.boardproject.repository.BoardFileRepository;
 import com.example.boardproject.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +32,8 @@ import java.util.Optional;
 public class BoardService {
     private final BoardRepository boardRepository;
     private final BoardFileRepository boardFileRepository;
+    @Value("${file.spring_img}")
+    String savePath;
 
     public void save(BoardDTO boardDTO) throws IOException {
         // Controller단에서 DTO를 받아서 Entity로 변경해준 뒤, Repository에 저장
@@ -58,8 +61,9 @@ public class BoardService {
                 // MultipartFile boardFile = boardDTO.getBoardFile(); // 1.
                 String originalFileName = boardFile.getOriginalFilename(); // 2.
                 String storedFileName = System.currentTimeMillis() + "_" + originalFileName; // 3.
-                String savePath = System.getProperty("user.home") + "/Desktop/springboot_img/" + storedFileName; // 4.
-                boardFile.transferTo(new File(savePath)); // 5. 이 부분에 의해 throws IOException 처리를 해주어야함.
+                String path = savePath + storedFileName;
+//                String savePath = System.getProperty("user.home") + "/Desktop/springboot_img/" + storedFileName; // 4.
+                boardFile.transferTo(new File(path)); // 5. 이 부분에 의해 throws IOException 처리를 해주어야함.
                 BoardFileEntity boardFileEntity = BoardFileEntity.toBoardFileEntity(board, originalFileName, storedFileName);
                 boardFileRepository.save(boardFileEntity);
             }
@@ -108,10 +112,14 @@ public class BoardService {
         boardRepository.deleteById(id);
     }
 
-    public Page<BoardDTO> paging(Pageable pageable) {
+    public Page<BoardDTO> paging(Pageable pageable, Integer pageLimit) {
+        if(pageLimit == null){
+            pageLimit = 3;
+        }
         // pageable을 입력받아, 해당되는 Page<BoardDTO> 객체를 반환
         int page = pageable.getPageNumber() - 1; // page 위치에 있는 값은 0부터 시작(요청은 1부터 시작)
-        int pageLimit = 3; // 한 페이지에 보여줄 글 갯수
+        // int pageLimit = 3; // 한 페이지에 보여줄 글 갯수
+        System.out.println("pageLimit: " + pageLimit);
         Page<BoardEntity> boardEntities = // BoardEntity의 id를 기준으로 내림차순하여 한 페이지에 3개의 글을 보여줌.
                 boardRepository.findAll(PageRequest.of(page,pageLimit, Sort.by(Sort.Direction.DESC,"id")));
 //        System.out.println("boardEntities.getContent() = " + boardEntities.getContent()); // 요청 페이지에 해당하는 글

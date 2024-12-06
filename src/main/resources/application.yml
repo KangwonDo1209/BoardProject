@@ -19,3 +19,11 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+
+# 이미지 폴더 주소 설정
+#   import org.springframework.beans.factory.annotation.Value;
+#   @Value("${file.spring_img}")
+#   String savePath;
+#
+file:
+  spring_img: ${user.home}\Desktop\springboot_img\
