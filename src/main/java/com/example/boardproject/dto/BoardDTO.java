@@ -24,9 +24,11 @@ public class BoardDTO {
     private int boardHits;
     private LocalDateTime boardCreatedTime;
     private LocalDateTime boardUpdatedTime;
+    private String youtubeId;
+    private int youtubeAttached;
 
     private List<MultipartFile> boardFile; // save.html -> Controller 파일 담는 용도
-    private List<String> originalFileName; // 원본 파일 이름
+    private List<String> originalFileName; // 원본 파일 이름-
     private List<String> storedFileName; // 서버 저장용 파일 이름
     private int fileAttached; // 파일 첨부 여부(첨부 1, 미첨부 0)
 
@@ -50,6 +52,14 @@ public class BoardDTO {
         boardDTO.setBoardHits(boardEntity.getBoardHits());
         boardDTO.setBoardCreatedTime(boardEntity.getCreatedTime());
         boardDTO.setBoardUpdatedTime(boardEntity.getUpdatedTime());
+
+        if(boardEntity.getYoutubeAttached() == 0){
+            boardDTO.setYoutubeAttached(boardEntity.getYoutubeAttached()); // 0
+        } else {
+            boardDTO.setYoutubeAttached(boardEntity.getYoutubeAttached()); // 1
+            boardDTO.setYoutubeId(boardEntity.getYoutubeId());
+        }
+
         if (boardEntity.getFileAttached() == 0){
             boardDTO.setFileAttached(boardEntity.getFileAttached()); // 0
         } else {

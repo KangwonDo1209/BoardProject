@@ -84,7 +84,6 @@ public class BoardController {
     @GetMapping("/paging")
     public String paging(@PageableDefault(page = 1) Pageable pageable, @RequestParam(defaultValue = "3") int pageLimit, Model model){ // page를 입력으로 받으며, 입력이 없을 시 1페이지로 제공
         // 입력받은 페이지에 해당하는 게시글 기본 정보를 boardList에 저장
-        System.out.println("pageLimit = " + pageLimit);
         Page<BoardDTO> boardList = boardService.paging(pageable,pageLimit); // BoardDTO가 담긴 Page객체를 서비스에 호출(pageable을 파라미터로)
         // 페이지 목록 정보(1,2,3... 페이지)
         int blockLimit = 5; // 1 2 3 4 5

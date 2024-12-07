@@ -39,6 +39,19 @@
       <img th:src="@{|/upload/${fileName}|}" alt="">
     </td>
   </tr>
+  <tr th:if="${board.youtubeAttached == 1}">
+    <th>youtube</th>
+    <td>
+      <iframe
+              width="560" height="315"
+              th:src="'https://www.youtube.com/embed/' + ${board.youtubeId}"
+              title="YouTube video player"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen></iframe>
+    </td>
+  </tr>
 </table>
 <button onclick="listReq()">목록</button>
 <button onclick="updateReq()">수정</button>
@@ -128,5 +141,6 @@
     const id = [[${board.id}]];
     location.href = "/board/delete/" + id;
   }
+
 </script>
 </html>

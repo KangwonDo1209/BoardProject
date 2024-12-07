@@ -36,39 +36,37 @@ public class BoardService {
     String savePath;
 
     public void save(BoardDTO boardDTO) throws IOException {
-        // Controller단에서 DTO를 받아서 Entity로 변경해준 뒤, Repository에 저장
-        // 파일 첨부 여부에 따라 로직 분리
-        if(boardDTO.getBoardFile().isEmpty()){
-            // 첨부 파일 없음
-            BoardEntity boardEntity = BoardEntity.toSaveEntity(boardDTO);
-            boardRepository.save(boardEntity);
-        } else{
-            // 첨부 파일 있음
-            /*
-            *   1. DTO에 담긴  파일을 꺼냄
-            *   2. 파일의 이름 가져옴
-            *   3. 서버 저장용 이름을 만듦
-            *   // 내사진.jpg => 839798375892_내사진.jpg
-            *   4. 저장 경로 설정
-            *   5. 해당 경로에 파일 저장
-            *   6. board_table에 해당 데이터 save 처리
-            *   7. board_file_table에 해당 데이터 save 처리
-            */
-            BoardEntity boardEntity = BoardEntity.toSaveFileEntity(boardDTO); // (id 미존재)
-            Long saveId = boardRepository.save(boardEntity).getId();
-            BoardEntity board = boardRepository.findById(saveId).get(); // 부모 Entity (id 존재)
-            for(MultipartFile boardFile: boardDTO.getBoardFile()){
-                // MultipartFile boardFile = boardDTO.getBoardFile(); // 1.
-                String originalFileName = boardFile.getOriginalFilename(); // 2.
-                String storedFileName = System.currentTimeMillis() + "_" + originalFileName; // 3.
-                String path = savePath + storedFileName;
-//                String savePath = System.getProperty("user.home") + "/Desktop/springboot_img/" + storedFileName; // 4.
-                boardFile.transferTo(new File(path)); // 5. 이 부분에 의해 throws IOException 처리를 해주어야함.
-                BoardFileEntity boardFileEntity = BoardFileEntity.toBoardFileEntity(board, originalFileName, storedFileName);
-                boardFileRepository.save(boardFileEntity);
+        // Controller 단에서 DTO를 받아서 Entity로 변경해준 뒤, Repository에 저장
+        String link = boardDTO.getYoutubeId();
+        int haveLink = link.trim().isEmpty() ? 0 : 1;
+
+        // 첨부 파일 중 유효한 파일만 필터링
+        List<MultipartFile> validFiles = new ArrayList<>();
+        for (MultipartFile file : boardDTO.getBoardFile()) {
+            if (file != null && !file.isEmpty() && file.getOriginalFilename() != null) {
+                validFiles.add(file);
             }
         }
+        if (validFiles.isEmpty()) {
+            // 첨부 파일 없음
+            BoardEntity boardEntity = BoardEntity.toSaveEntity(boardDTO,0,haveLink);
+            boardRepository.save(boardEntity);
+        } else {
+            // 첨부 파일 있음
+            BoardEntity boardEntity = BoardEntity.toSaveEntity(boardDTO,1,haveLink); // (id 미존재)
+            Long saveId = boardRepository.save(boardEntity).getId();
+            BoardEntity board = boardRepository.findById(saveId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
 
+            for (MultipartFile boardFile : validFiles) {
+                String originalFileName = boardFile.getOriginalFilename(); // 2. 원본 파일 이름
+                String storedFileName = System.currentTimeMillis() + "_" + originalFileName; // 3. 저장용 파일 이름
+                String path = savePath + storedFileName;
+
+                boardFile.transferTo(new File(path)); // 5. 파일 저장
+                BoardFileEntity boardFileEntity = BoardFileEntity.toBoardFileEntity(board, originalFileName, storedFileName);
+                boardFileRepository.save(boardFileEntity); // 첨부 파일 정보 저장
+            }
+        }
     }
 
     @Transactional
@@ -118,17 +116,8 @@ public class BoardService {
         }
         // pageable을 입력받아, 해당되는 Page<BoardDTO> 객체를 반환
         int page = pageable.getPageNumber() - 1; // page 위치에 있는 값은 0부터 시작(요청은 1부터 시작)
-        // int pageLimit = 3; // 한 페이지에 보여줄 글 갯수
         Page<BoardEntity> boardEntities = // BoardEntity의 id를 기준으로 내림차순하여 한 페이지에 3개의 글을 보여줌.
                 boardRepository.findAll(PageRequest.of(page,pageLimit, Sort.by(Sort.Direction.DESC,"id")));
-//        System.out.println("boardEntities.getContent() = " + boardEntities.getContent()); // 요청 페이지에 해당하는 글
-//        System.out.println("boardEntities.getTotalElements() = " + boardEntities.getTotalElements()); // 전체 글갯수
-//        System.out.println("boardEntities.getNumber() = " + boardEntities.getNumber()); // DB로 요청한 페이지 번호
-//        System.out.println("boardEntities.getTotalPages() = " + boardEntities.getTotalPages()); // 전체 페이지 갯수
-//        System.out.println("boardEntities.getSize() = " + boardEntities.getSize()); // 한 페이지에 보여지는 글 갯수
-//        System.out.println("boardEntities.hasPrevious() = " + boardEntities.hasPrevious()); // 이전 페이지 존재 여부
-//        System.out.println("boardEntities.isFirst() = " + boardEntities.isFirst()); // 첫 페이지 여부
-//        System.out.println("boardEntities.isLast() = " + boardEntities.isLast()); // 마지막 페이지 여부
 
         // 목록: id, writer, title, hits, createdTime
         Page<BoardDTO> boardDTOS = boardEntities.map(board -> new BoardDTO(
