@@ -35,8 +35,10 @@
   </tr>
   <tr th:if="${board.fileAttached == 1}">
     <th>image</th>
-    <td th:each="fileName: ${board.storedFileName}">
-      <img th:src="@{|/upload/${fileName}|}" alt="">
+    <td>
+      <div th:each="fileName : ${board.storedFileName}">
+        <img th:src="@{|/upload/${fileName}|}" alt="Uploaded Image">
+      </div>
     </td>
   </tr>
   <tr th:if="${board.youtubeAttached == 1}">
@@ -46,7 +48,6 @@
               width="560" height="315"
               th:src="'https://www.youtube.com/embed/' + ${board.youtubeId}"
               title="YouTube video player"
-              frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               referrerpolicy="strict-origin-when-cross-origin"
               allowfullscreen></iframe>
@@ -125,7 +126,7 @@
     });
   }
 
-  const listReq = () => {
+  const listReq = () =>  {
     console.log("목록 요청");
     const page = [[${page}]];
     const pageLimit = [[${pageLimit}]];
